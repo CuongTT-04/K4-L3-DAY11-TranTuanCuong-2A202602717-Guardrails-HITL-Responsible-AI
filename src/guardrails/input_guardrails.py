@@ -100,15 +100,20 @@ def topic_filter(user_input: str) -> InputStatus:
         ``"BLOCK"`` = chặn (off-topic hoặc topic cấm).
         ``"ALLOW"`` = cho qua (câu banking hợp lệ).
     """
+    import unicodedata
+
     input_lower = user_input.lower()
+    # Normalize Vietnamese accents to unaccented (e.g., 'lãi suất' -> 'lai suat')
+    nfkd = unicodedata.normalize("NFKD", input_lower)
+    unaccented = "".join(c for c in nfkd if unicodedata.category(c) != "Mn").replace("đ", "d").replace("Đ", "d")
 
     # 1. If input contains any blocked topic -> return "BLOCK"
     for b in BLOCKED_TOPICS:
-        if b in input_lower:
+        if b in input_lower or b in unaccented:
             return "BLOCK"
 
     # 2. If input doesn't contain any allowed topic -> return "BLOCK"
-    if not any(a in input_lower for a in ALLOWED_TOPICS):
+    if not (any(a in input_lower for a in ALLOWED_TOPICS) or any(a in unaccented for a in ALLOWED_TOPICS)):
         return "BLOCK"
 
     # 3. Otherwise -> return "ALLOW"

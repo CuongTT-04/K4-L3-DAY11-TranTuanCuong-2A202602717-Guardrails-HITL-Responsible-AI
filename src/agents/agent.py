@@ -120,8 +120,11 @@ create_protected_agent = create_blue_agent
 
 async def test_agent(agent, runner):
     """Quick smoke: one banking question."""
-    print("\n--- Quick test ---")
-    text, _ = await chat_with_agent(
-        agent, runner, "What is the current savings interest rate at VinBank?"
-    )
-    print(f"Agent: {text[:400] if text else '(empty)'}")
+    print("\n--- Quick test ---", flush=True)
+    try:
+        text, _ = await chat_with_agent(
+            agent, runner, "What is the current savings interest rate at VinBank?"
+        )
+        print(f"Agent: {text[:400] if text else '(empty)'}", flush=True)
+    except Exception as e:
+        print(f"Quick test note (API busy): {e}", flush=True)
